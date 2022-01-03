@@ -1,0 +1,28 @@
+  
+@D( ii1=iib:iie:ip , ij=i2jb:ije , k )
+
+@D( 1,j,ik=1:2:kb:ke:ks )
+
+@D( ii1=iib+1:iie-1 )
+
+
+@D( ii1=iib:iie:ip , ij=i2jb:ije , ik=ikb:ike:iks )
+
+A(iib:iie:is , ijb:ije:js , k)
+
+B(:,:,:)
+
+C(iib+1:,ijb-1:,:) = D(iib-1:,ijb-1:,:)
+
+Fct(D(iib-1:,ijb-1:,:))
+ 
+! expand_array(ii1=iib:iie:ip , ij=i2jb:ije , ik=ikb:ike:iks) 
+
+F(iib:iie:ip,i2jb:ije,k) =  D( iib:iie:ip , i2jb:ije , k ) + Fct(D(iib-1:,ijb-1:,:))
+C( iib: iie :ip , i2jb: ije , k)
+
+D( i: , j,k )
+
+! end_expand_array(TYPE)
+
+Fct(D(iib-1:,ijb-1:,:))
