@@ -1,0 +1,19 @@
+#
+# Pour faire du perl interactif , demmarrer le mode debugger
+#
+perl -d -e 1
+
+#
+# lancement de filepp avec le module MesoNH 
+# 
+filepp -M. -m MNH.pm  toto.F90
+
+#
+## enchainemeent analyse + extend array
+##
+filepp -imacros mnh_macro_expand.fpp titi.F90  |filepp -imacros mnh_macro_array_loop.fpp -M. -m MNH.pm -c
+
+#
+# pour allouer les expresions régulières # ou !$mnh -> SetKeywordchar #|!\$mnh
+#
+filepp -re -imacros mnh_macro_expand.fpp titi.F90  |filepp -imacros mnh_macro_array_loop.fpp -M. -m MNH.pm -c
