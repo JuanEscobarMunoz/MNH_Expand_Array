@@ -1,0 +1,10 @@
+#!/bin/bash
+#get opt + filename
+OPT=""
+while [[ $# -gt 1 ]]; do
+    OPT+=" $1"
+    shift 
+done
+FILE=$1
+
+filepp ${OPT} -imacros mnh_macro_expand.fpp ${OPT} ${FILE} | filepp ${OPT} -imacros mnh_macro_array_loop.fpp -M. -m MNH.pm -c 
