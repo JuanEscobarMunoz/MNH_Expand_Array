@@ -52,14 +52,14 @@ sub Set_slide_default
     my $slide_step  = "" ;
     my $slide_index  = "" ;
     
-    my $x = "" ; 
+    my $x = "" ;
 
     #DEBUG
     my $arg = "" ;
     $arg  = join (" || " , @_) ;  
-
-
-    # Restep Global Default Slide
+    Filepp::Debug("MNH Debug ::Set_slide_default arg=[[$arg]]\n" ) ;
+    
+    # Reset Global Default Slide
     @MNH_slide_default_on    = () ;
     @MNH_slide_default_name  = () ;
     @MNH_slide_default_begin = () ;  
@@ -72,49 +72,104 @@ sub Set_slide_default
 
     # loop over slide
     foreach $slide (@_) 
-         { 
-	     $index ++ ;
-	     # surpress space
-	     $slide =~ s/\s//g ;
-	     #
-	     if ( $slide =~ /:/ ) {
-		 # slide contain ':' -> Ok ,register it
-		 $slide_on  = 1 ;
-		 ( $slide_name , $slide_begin, $slide_end , $x ,$slide_step )
-		     = ( $slide =~ /^\s*([A-z]\w*)=([^:]*):([^:]*)(:([^:]+))?/ ) ;
-
-		 # if not step -> set to 1   
-		 $slide_step = "1" if ( !defined($slide_step) ) ;
-
-		 # DEBUG
-		 $liste .=  " N=$slide_name = B=$slide_begin :: E=$slide_end :: S=$slide_step "  . " | " ;	 
-	     }
-	     else {
-		 # slide without ':' <-> index variable or constant , inactivate it 
-		 $slide_on  = 0 ;
-		 ( $slide_name , $slide_begin, $slide_end ,$slide_step ) = ( "NA" , $slide , "NA", "NA" ) ;
-		 $liste .= " $slide |" ;
-	     }
-	     
-	     push ( @MNH_slide_default_on    , $slide_on ) ;
-	     push ( @MNH_slide_default_name  , $slide_name ) ;
-	     push ( @MNH_slide_default_begin , $slide_begin ) ;  
-	     push ( @MNH_slide_default_end   , $slide_end ) ;
-	     push ( @MNH_slide_default_step  , $slide_step ) ;
-	     push ( @MNH_slide_default_index ,  0 ) ;
-	     
-	     #DEBUG
-	     #print "name[$index]=@MNH_slide_default_name \n" ;
-	     
-	 }
+    { 
+	$index ++ ;
+	# surpress space
+	$slide =~ s/\s//g ;
+	#
+	if ( $slide =~ /:/ ) {
+	    # slide contain ':' -> Ok ,register it
+	    $slide_on  = 1 ;
+	    ( $slide_name , $slide_begin, $slide_end , $x ,$slide_step )
+		= ( $slide =~ /^\s*([A-z]\w*)=([^:]*):([^:]*)(:([^:]+))?/ ) ;
+	    
+	    # if not step -> set to 1   
+	    $slide_step = "1" if ( !defined($slide_step) ) ;
+	    
+	    # DEBUG
+	    $liste .=  " N=$slide_name = B=$slide_begin :: E=$slide_end :: S=$slide_step "  . " | " ;	 
+	}
+	else {
+	    # slide without ':' <-> index variable or constant , inactivate it 
+	    $slide_on  = 0 ;
+	    ( $slide_name , $slide_begin, $slide_end ,$slide_step ) = ( "NA" , $slide , "NA", "NA" ) ;
+	    $liste .= " $slide |" ;
+	}
+	
+	push ( @MNH_slide_default_on    , $slide_on ) ;
+	push ( @MNH_slide_default_name  , $slide_name ) ;
+	push ( @MNH_slide_default_begin , $slide_begin ) ;  
+	push ( @MNH_slide_default_end   , $slide_end ) ;
+	push ( @MNH_slide_default_step  , $slide_step ) ;
+	push ( @MNH_slide_default_index ,  0 ) ;
+	
+    }
     
-    print "on   = @MNH_slide_default_on   \n" ;
-    print "name = @MNH_slide_default_name \n" ;
-    
-    return "MNH::Set_slide_default::[".$arg."] >>".$liste;
+    Filepp::Debug "MNH Debug::Set_slide_default:on   = @MNH_slide_default_on   \n" ;
+    Filepp::Debug "MNH Debug::Set_slide_default:name = @MNH_slide_default_name \n" ;
+       
+    Filepp::Debug("MNH Debug::Set_slide_default::[$arg] >> $liste" );
+
+    # Output DO nest or DO CONCCURENT
+    if(Filepp::Ifdef("MNH_EXPAND_LOOP")) {
+	my $indice = "" ;
+	foreach $slide (@MNH_slide_default_begin)
+	{
+	    $slide_on = $MNH_slide_default_on[$index] ;
+	    if ( $slide_on ) {
+		$slide_name  = $MNH_slide_default_name[$index] ;
+		$slide_begin = $MNH_slide_default_begin[$index] ;
+		$slide_end   = $MNH_slide_default_end[$index] ;
+		$slide_step  = $MNH_slide_default_step[$index] ;
+		$indice = "$slide_name=$slide_begin,$slide_end" ;
+		$indice .= ",$slide_step" if ( $slide_step ne "1" ) ;
+		print "DO $indice " ;
+		print " ; " if ( $index != 0 ) ;
+	    }
+	    $index-- ;
+	}
+	print "\n" ;
+       }
+       else {
+	   $arg  = join ("," , @_) ;
+	   print "DO CONCURRENT ($arg)" ;
+       }
+       return "" ;    
 }
 Function::AddFunction("set_slide_default", "MNH::Set_slide_default");
 
+########################################################################
+# Get_slide_default all input, usage: - ANY NUMBER OF INPUTS
+# Get_slide_default(ii=nib:nie:ip ,ij=njb:nje,jp, ik=nkb:nke,kp ....)
+# if dim doesn't contain ':' , slide is not activate
+# return ENDDO for loop/do concurrent
+########################################################################
+sub Get_slide_default
+{
+    my $arg = join (",",@_) ;
+    # Output ENDDO for LOOP or DO CONCURRENT
+    if(Filepp::Ifdef("MNH_EXPAND_LOOP")) {
+	my $index = -1 ;
+	my $size = @MNH_slide_default_begin ;
+	my $slide ;
+	my $slide_on ;
+	foreach $slide (@MNH_slide_default_begin)
+	{
+	    $index++ ;
+	    $slide_on = $MNH_slide_default_on[$index] ;
+	    if ( $slide_on ) {
+		print "ENDDO" ;
+		print " ; " if ( $index < $size-1 ) ;
+	    }
+	}
+	print "! [$arg]\n" ;	
+    }
+    else {
+	print "ENDDO ! CONCURRENT [$arg]" ;
+    }
+    return "" ; 
+}
+Function::AddFunction("get_slide_default", "MNH::Get_slide_default");    
 ########################################################################
 # Set_slide_left all input, usage: - ANY NUMBER OF INPUTS
 # Set_slide_left( A(ii=nib:nie:ip ,ij=njb:nje,jp, ik=nkb:nke,kp ....) )
@@ -141,8 +196,9 @@ sub Set_slide_left
     #DEBUG
     my $arg = "" ;
     $arg  = join (" || " , @_) ;  
+    Filepp::Debug("MNH Debug ::Set_slide_left arg=[[$arg]]\n" ) ;
 
-    # Restep Global Left Slide
+    # Reset Global Left Slide
     @MNH_slide_left_on    = () ;
     @MNH_slide_left_index  = () ;
     @MNH_slide_left_begin = () ;  
@@ -169,20 +225,19 @@ sub Set_slide_left
 		 ( $slide_begin, $slide_end , $x ,$slide_step )
 		     = ( $slide =~ /([^:]*):([^:]*)(:([^:]+))?/ ) ;
 
-                 # not begin -> get default 
+                 # no begin -> get default 
 		 $slide_begin = $MNH_slide_default_begin[$index] if ( ! $slide_begin ) ;
 
-                 # not end -> get default 
+                 # no end -> get default 
 		 $slide_end = $MNH_slide_default_end[$index] if ( ! $slide_end ) ;
 		 
-		 # if not step -> set to 1   
+		 # if no step -> set to 1   
 		 $slide_step = "1" if ( !defined($slide_step) ) ;		 
 
 		 # DEBUG
 		 $liste .=  " B=$slide_begin :: E=$slide_end :: S=$slide_step "  . " | " ;	 
 	     }
 	     else {
-
 		 $slide_on  = 0 ;
 		 ( $slide_begin, $slide_end ,$slide_step ) = ( $slide , "NA", "NA" ) ;
 		 $liste .= " $slide |" ;
@@ -193,15 +248,29 @@ sub Set_slide_left
 	     push ( @MNH_slide_left_end   , $slide_end ) ;
 	     push ( @MNH_slide_left_step  , $slide_step ) ;
 	     push ( @MNH_slide_left_index ,  0 ) ;
-	     
-	     #DEBUG
-	     #print "name[$index]=MNH_slide_left_name \n" ;
-	     
+	     	     
 	 }
-    print "on   = @MNH_slide_left_on   \n" ;
-    print "array name =$MNH_slide_left_array \n" ;
+    Filepp::Debug("MNH Debug ::Set_slide_left:on   = @MNH_slide_left_on   \n") ;
+    Filepp::Debug("MNH Debug ::Set_slide_left:array name =$MNH_slide_left_array \n") ;
+
+    Filepp::Debug("MNH Debug ::Set_slide_left:[$arg] >> array{$array} :: $liste\n" ) ;
     
-    return "MNH::Set_slide_left[".$arg."] >> array{".$array."} :: ".$liste;
+    $index = -1 ;
+    foreach $slide (@MNH_slide_left_begin)
+    {
+	$index ++ ;
+	# remove left/default bound if itentical 
+	if ( $MNH_slide_left_begin[$index] eq $MNH_slide_default_begin[$index]  ) {
+	    $MNH_slide_left_index[$index] = $MNH_slide_default_name[$index] ;
+	}
+	else {
+	    $MNH_slide_left_index[$index] = "$MNH_slide_default_name[$index]+$MNH_slide_left_begin[$index]-($MNH_slide_default_begin[$index]) " ;
+	}
+	# if contante index -> no loop iter index 
+	$MNH_slide_left_index[$index] = $MNH_slide_left_begin[$index] if ( ! $MNH_slide_left_on[$index] ) ;
+    }
+    $indice =  join ("," , @MNH_slide_left_index) ;
+    return "$array($indice)";
 }
 Function::AddFunction("set_slide_left", "MNH::Set_slide_left");
 
@@ -231,8 +300,9 @@ sub Set_slide_right
     #DEBUG
     my $arg = "" ;
     $arg  = join (" || " , @_) ;  
-
-    # Restep Global Right Slide
+    Filepp::Debug("MNH Debug ::Set_slide_right arg=[[$arg]]\n" ) ;
+    
+    # Reset Global Right Slide
     @MNH_slide_right_on    = () ;
     @MNH_slide_right_index  = () ;
     @MNH_slide_right_begin = () ;  
@@ -254,32 +324,30 @@ sub Set_slide_right
 	     # surpress space
 	     $slide =~ s/\s//g ;
 	     if ( $slide =~ /:/ ) {
-
 		 $slide_on  = 1 ;
 		 ( $slide_begin, $slide_end , $x ,$slide_step )
 		     = ( $slide =~ /([^:]*):([^:]*)(:([^:]+))?/ ) ;
-
-                 # not begin -> get default 
+                 # no begin -> get default 
 		 $slide_begin = $MNH_slide_default_begin[$index] if ( ! $slide_begin ) ;
 		 # compute delta with left begin	 
-		 if ( $slide_begin eq $MNH_slide_left_begin[$index] ) {
-		     $slide_begin .= "-($MNH_slide_left_begin[$index])->0" ;
-		 }
-		 else {
-		     $slide_begin .= "-($MNH_slide_left_begin[$index])" ;
-		 }
+		 #if ( $slide_begin eq $MNH_slide_left_begin[$index] ) {
+		 #    $slide_begin .= "-($MNH_slide_left_begin[$index])->0" ;
+		 #}
+		 #else {
+		 #    $slide_begin .= "-($MNH_slide_left_begin[$index])" ;
+		 #}
 
-                 # not end -> get default 
+                 # no end -> get default 
 		 $slide_end = $MNH_slide_default_end[$index] if ( ! $slide_end ) ;
 		 # compute delta with left end
-		  if ( $slide_end eq $MNH_slide_left_end[$index] ) {
-		     $slide_end .= "-($MNH_slide_left_end[$index])->0" ;
-		 }
-		 else {
-		     $slide_end .= "-($MNH_slide_left_end[$index])" ;
-		 }
+		 # if ( $slide_end eq $MNH_slide_left_end[$index] ) {
+		 #    $slide_end .= "-($MNH_slide_left_end[$index])->0" ;
+		 #}
+		 #else {
+		 #    $slide_end .= "-($MNH_slide_left_end[$index])" ;
+		 #}
 		 
-		 # if not step -> set to 1   
+		 # if no step -> set to 1   
 		 $slide_step = "1" if ( !defined($slide_step) ) ;		 
 
 		 # DEBUG
@@ -293,19 +361,35 @@ sub Set_slide_right
 	     }
 	     
 	     push ( @MNH_slide_right_on    , $slide_on ) ;
-	     push ( @MNH_slide_right_begin , $slide_end ) ;  
+	     push ( @MNH_slide_right_begin , $slide_begin ) ;  
 	     push ( @MNH_slide_right_end   , $slide_end ) ;
 	     push ( @MNH_slide_right_step  , $slide_step ) ;
-	     push ( @MNH_slide_right_index ,  0 ) ;
-	     
-	     #DEBUG
-	     #print "name[$index]=MNH_slide_right_name \n" ;
+	     push ( @MNH_slide_right_index ,  0 ) ;	     
 	     
 	 }
-    print "on   = @MNH_slide_right_on   \n" ;
-    print "array name =$MNH_slide_right_array \n" ;
+
+    Filepp::Debug("MNH Debug ::Set_slide_right:on   = @MNH_slide_right_on   \n") ;
+    Filepp::Debug("MNH Debug ::Set_slide_right:array name =$MNH_slide_right_array \n") ;
     
-    return "\nMNH::Set_slide_right[".$arg."] >> array{".$array."} :: ".$liste ;
+    Filepp::Debug("MNH Debug ::Set_slide_right[$arg] >> array{$array} :: $liste\n" ) ;
+    
+    $index = -1 ;
+    foreach $slide (@MNH_slide_right_begin)
+    {
+	$index ++ ;
+	# remove left/default bound if itentical 
+	if ( $MNH_slide_right_begin[$index] eq $MNH_slide_left_begin[$index]  ) {
+	    $MNH_slide_right_index[$index] = $MNH_slide_default_name[$index] ;
+	}
+	else {
+	    $MNH_slide_right_index[$index] = "$MNH_slide_default_name[$index]+$MNH_slide_right_begin[$index]-($MNH_slide_left_begin[$index]) " ;
+	}
+	# if contante index -> no loop iter index 
+	$MNH_slide_right_index[$index] = $MNH_slide_right_begin[$index] if ( ! $MNH_slide_right_on[$index] ) ;
+    }
+    $indice =  join ("," , @MNH_slide_right_index) ;
+    return "$array($indice)" ;
+    
 }
 Function::AddFunction("set_slide_right", "MNH::Set_slide_right");
 
