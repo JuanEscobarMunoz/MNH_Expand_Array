@@ -174,8 +174,9 @@ INTEGER :: JL , JLU
   ZMIXRT(:)=0.1
 
 !                1.4 Estimation of PPART_DRY
-  WHERE(OTEST)
-    WHERE(OTESTLCL)
+!$mnh expand_where(JL=1:JLU)  
+  WHERE(OTEST(:))
+    WHERE(OTESTLCL(:))
       !No dry part when condensation level is reached
       PPART_DRY(:)=0.
       ZDZ_STOP(:)=0.
@@ -203,9 +204,10 @@ INTEGER :: JL , JLU
       ZDZ_STOP(:) = (PZZ(:,KK+KKL)-PZZ(:,KK))*PPART_DRY(:)
     ENDWHERE
   ENDWHERE
-
-! expand_array(JL=1:JLU)
+!$mnh end_expand_where(JL=1:JLU)
+  
 !               1.5 Gradient and flux values of thetav
+!$mnh expand_array(JL=1:JLU)
   IF(KK/=KKB)THEN
     ZCOEFF_MINUS_HALF(:)=((PTHVM(:,KK)-PTHVM(:,KK-KKL))/PDZZ(:,KK))
     ZTHV_MINUS_HALF(:) = PTHVM(:,KK) - ZCOEFF_MINUS_HALF(:)*0.5*(PZZ(:,KK+KKL)-PZZ(:,KK))
@@ -215,8 +217,7 @@ INTEGER :: JL , JLU
   ENDIF
   ZCOEFF_PLUS_HALF(:)  = ((PTHVM(:,KK+KKL)-PTHVM(:,KK))/PDZZ(:,KK+KKL))
   ZTHV_PLUS_HALF(:)  = PTHVM(:,KK) + ZCOEFF_PLUS_HALF(:)*0.5*(PZZ(:,KK+KKL)-PZZ(:,KK))
-
-! end_expand_array(JL=1:JLU)
+!$mnh end_expand_array(JL=1:JLU)
 !
 !               2  Dry part computation:
 !                  Integral buoyancy and computation of PENTR and PDETR for dry part
@@ -278,21 +279,20 @@ INTEGER :: JL , JLU
   ! Compute theta_v of updraft at flux level KK+KKL                   
   !MIX variables are used to avoid declaring new variables
   !but we are dealing with updraft and not mixture
-!  
-! expand_array(JL=1:JLU)
-!  
+ 
+!$mnh expand_array(JL=1:JLU)  
   ZRCMIX(:)=PRC_UP(:)
   ZRIMIX(:)=PRI_UP(:)
   CALL TH_R_FROM_THL_RT_1D(HFRAC_ICE,ZFRAC_ICE,&
                PPRE_PLUS_HALF,PTHL_UP,PRT_UP,&
                ZTHMIX,ZRVMIX,ZRCMIX,ZRIMIX,&
                ZRSATW, ZRSATI)
-  ZTHV_UP_F2(:) = ZTHMIX(:)*(1.+ZRVORD*ZRVMIX(:))/(1.+PRT_UP(:))
-!  
-! end_expand_array(JL=1:JLU)
-!
+  ZTHV_UP_F2(:) = ZTHMIX(:)*(1.+ZRVORD*ZRVMIX(:))/(1.+PRT_UP(:)) 
+!$mnh end_expand_array(JL=1:JLU)
+
   ! Integral buoyancy for cloudy part
-  WHERE(OTEST)
+  !$mnh expand_where(JL=1:JLU)
+  WHERE(OTEST(:))
     WHERE(PPART_DRY(:)<1.)
       !Gradient of Theta V updraft over the cloudy part, assuming that thetaV updraft don't change
       !between flux level KK and bottom of cloudy part
@@ -320,7 +320,8 @@ INTEGER :: JL , JLU
     !No cloudy part
     PBUO_INTEG_CLD(:)=0.
   ENDWHERE
-
+  !$mnh end_expand_where(JL=1:JLU)
+!  
 !               3.2 Critical mixed fraction for KK+KKL flux level (ZKIC_F2) and
 !                   for bottom of cloudy part (ZKIC), then a mean for the cloudy part
 !                   (put also in ZKIC)
@@ -336,9 +337,9 @@ INTEGER :: JL , JLU
   !    and cons then non cons. var. of mixture at the bottom of cloudy part
 
   !   JI computed to avoid KKL(KK-KKL) being < KKL*KKB
-  JI=KKL*MAX(KKL*(KK-KKL),KKL*KKB)
-
-  WHERE(OTEST .AND. PPART_DRY(:)>0.5)
+  JI=KKL*MAX(KKL*(KK-KKL),KKL*KKB) 
+  !$mnh expand_where(JL=1:JLU)
+  WHERE(OTEST(:) .AND. PPART_DRY(:)>0.5)
     ZDZ(:)=ZDZ_STOP(:)-0.5*(PZZ(:,KK+KKL)-PZZ(:,KK))
     ZTHV(:)= PTHVM(:,KK)+ZCOEFF_PLUS_HALF(:)*ZDZ(:)
     ZMIXTHL(:) = ZKIC_INIT * &
@@ -347,7 +348,7 @@ INTEGER :: JL , JLU
     ZMIXRT(:)  = ZKIC_INIT * &
                  (PRTM(:,KK)+ZDZ(:)*(PRTM(:,KK+KKL)-PRTM(:,KK))/PDZZ(:,KK+KKL)) +   &
                  (1. - ZKIC_INIT)*PRT_UP(:)
-  ELSEWHERE(OTEST)
+  ELSEWHERE(OTEST(:))
     ZDZ(:)=0.5*(PZZ(:,KK+KKL)-PZZ(:,KK))-ZDZ_STOP(:)
     ZTHV(:)= PTHVM(:,KK)-ZCOEFF_MINUS_HALF(:)*ZDZ(:)
     ZMIXTHL(:) = ZKIC_INIT * &
@@ -356,11 +357,13 @@ INTEGER :: JL , JLU
     ZMIXRT(:)  = ZKIC_INIT * &
                  (PRTM(:,KK)-ZDZ(:)*(PRTM(:,KK)-PRTM(:,JI))/PDZZ(:,KK)) + &
                  (1. - ZKIC_INIT)*PRT_UP(:)
-  ENDWHERE
+  ENDWHERE  
+  !$mnh end_expand_where(JL=1:JLU)
   CALL TH_R_FROM_THL_RT_1D(HFRAC_ICE,ZFRAC_ICE,&
                ZPRE,ZMIXTHL,ZMIXRT,&
                ZTHMIX,ZRVMIX,PRC_MIX,PRI_MIX,&
                ZRSATW, ZRSATI)
+  !$mnh expand_array(JL=1:JLU)
   ZTHVMIX(:) = ZTHMIX(:)*(1.+ZRVORD*ZRVMIX(:))/(1.+ZMIXRT(:))
 
   !  Compute cons then non cons. var. of mixture at the flux level KK+KKL  with initial ZKIC
@@ -371,9 +374,10 @@ INTEGER :: JL , JLU
                ZTHMIX,ZRVMIX,PRC_MIX,PRI_MIX,&
                ZRSATW, ZRSATI)
   ZTHVMIX_F2(:) = ZTHMIX(:)*(1.+ZRVORD*ZRVMIX(:))/(1.+ZMIXRT(:))
-
+  !$mnh end_expand_array(JL=1:JLU)
   !Computation of mean ZKIC over the cloudy part
-  WHERE (OTEST)
+  !$mnh expand_where(JL=1:JLU)
+  WHERE (OTEST(:))
     ! Compute ZKIC at the bottom of cloudy part
     ! Thetav_up at bottom is equal to Thetav_up at flux level KK
     WHERE (ABS(PTHV_UP(:)-ZTHVMIX(:))<1.E-10)
@@ -392,7 +396,7 @@ INTEGER :: JL , JLU
     !Mean ZKIC over the cloudy part
     ZKIC(:)=MAX(MIN(0.5*(ZKIC(:)+ZKIC_F2(:)),1.),0.)
   ENDWHERE
-
+  !$mnh end_expand_where(JL=1:JLU)
 !               3.3 Integration of PDF
 !                   According to Kain and Fritsch (1990), we replace delta Mt
 !                   in eq. (7) and (8) using eq. (5). Here we compute the ratio
@@ -400,11 +404,12 @@ INTEGER :: JL , JLU
 
   !Constant PDF
   !For this PDF, eq. (5) is delta Me=0.5*delta Mt
-  WHERE(OTEST)
+  !$mnh expand_where(JL=1:JLU)
+  WHERE(OTEST(:))
     ZEPSI(:) = ZKIC(:)**2. !integration multiplied by 2
     ZDELTA(:) = (1.-ZKIC(:))**2. !idem
   ENDWHERE
-
+  !$mnh end_expand_where(JL=1:JLU)
   !Triangular PDF
   !Calculus must be verified before activating this part, but in this state,
   !results on ARM case are almost identical
@@ -420,8 +425,9 @@ INTEGER :: JL , JLU
   !  ENDWHERE
   !ENDWHERE
 
-!               3.4 Computation of PENTR and PDETR
-  WHERE (OTEST)
+  !               3.4 Computation of PENTR and PDETR
+  !$mnh expand_where(JL=1:JLU)
+  WHERE (OTEST(:))
     ZEPSI_CLOUD=MIN(ZDELTA,ZEPSI)
     PENTR_CLD(:) = (1.-PPART_DRY(:))*ZCOEFFMF_CLOUD*PRHODREF(:)*ZEPSI_CLOUD(:)
     PDETR_CLD(:) = (1.-PPART_DRY(:))*ZCOEFFMF_CLOUD*PRHODREF(:)*ZDELTA(:)
@@ -431,6 +437,6 @@ INTEGER :: JL , JLU
     PENTR_CLD(:) = 0.
     PDETR_CLD(:) = 0.
   ENDWHERE
-
+  !$mnh end_expand_where(JL=1:JLU)
 IF (LHOOK) CALL DR_HOOK('COMPUTE_ENTR_DETR',1,ZHOOK_HANDLE)
 END SUBROUTINE COMPUTE_ENTR_DETR
