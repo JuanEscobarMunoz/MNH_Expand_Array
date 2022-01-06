@@ -111,6 +111,7 @@ sub Set_slide_default
     Filepp::Debug("MNH Debug::Set_slide_default::[$arg] >> $liste" );
 
     # Output DO nest or DO CONCCURENT
+    my $do_list = "" ;
     if(Filepp::Ifdef("MNH_EXPAND_LOOP")) {
 	my $indice = "" ;
 	foreach $slide (@MNH_slide_default_begin)
@@ -123,18 +124,18 @@ sub Set_slide_default
 		$slide_step  = $MNH_slide_default_step[$index] ;
 		$indice = "$slide_name=$slide_begin,$slide_end" ;
 		$indice .= ",$slide_step" if ( $slide_step ne "1" ) ;
-		print "DO $indice " ;
-		print " ; " if ( $index != 0 ) ;
+		$do_list .= "DO $indice " ;
+		$do_list .= " ; " if ( $index != 0 ) ;
 	    }
 	    $index-- ;
 	}
-	print "\n" ;
+	#print "\n" ;
        }
        else {
 	   $arg  = join ("," , @_) ;
-	   print "DO CONCURRENT ($arg)" ;
+	   $do_list = "DO CONCURRENT ($arg)" ;
        }
-       return "" ;    
+       return $do_list ;    
 }
 Function::AddFunction("set_slide_default", "MNH::Set_slide_default");
 
@@ -148,6 +149,7 @@ sub Get_slide_default
 {
     my $arg = join (",",@_) ;
     # Output ENDDO for LOOP or DO CONCURRENT
+    my $enddo_list = "" ;
     if(Filepp::Ifdef("MNH_EXPAND_LOOP")) {
 	my $index = -1 ;
 	my $size = @MNH_slide_default_begin ;
@@ -158,16 +160,16 @@ sub Get_slide_default
 	    $index++ ;
 	    $slide_on = $MNH_slide_default_on[$index] ;
 	    if ( $slide_on ) {
-		print "ENDDO" ;
-		print " ; " if ( $index < $size-1 ) ;
+		$enddo_list .= "ENDDO" ;
+		$enddo_list .= " ; " if ( $index < $size-1 ) ;
 	    }
 	}
-	print "! [$arg]\n" ;	
+	$enddo_list .= "! [$arg]" ;	
     }
     else {
-	print "ENDDO ! CONCURRENT [$arg]" ;
+	$enddo_list = "ENDDO ! CONCURRENT [$arg]" ;
     }
-    return "" ; 
+    return $enddo_list ; 
 }
 Function::AddFunction("get_slide_default", "MNH::Get_slide_default");    
 ########################################################################
@@ -259,15 +261,20 @@ sub Set_slide_left
     foreach $slide (@MNH_slide_left_begin)
     {
 	$index ++ ;
-	# remove left/default bound if itentical 
-	if ( $MNH_slide_left_begin[$index] eq $MNH_slide_default_begin[$index]  ) {
-	    $MNH_slide_left_index[$index] = $MNH_slide_default_name[$index] ;
+	$slide_on =  $MNH_slide_left_on[$index] ;
+	if ( $slide_on ) {
+	    # remove left/default bound if itentical 
+	    if ( $MNH_slide_left_begin[$index] eq $MNH_slide_default_begin[$index]  ) {
+		$MNH_slide_left_index[$index] = $MNH_slide_default_name[$index] ;
+	    }
+	    else {
+		$MNH_slide_left_index[$index] = "$MNH_slide_default_name[$index]+$MNH_slide_left_begin[$index]-($MNH_slide_default_begin[$index]) " ;
+	    }
 	}
 	else {
-	    $MNH_slide_left_index[$index] = "$MNH_slide_default_name[$index]+$MNH_slide_left_begin[$index]-($MNH_slide_default_begin[$index]) " ;
+	    # if contante index -> no loop iter index 
+	    $MNH_slide_left_index[$index] = $MNH_slide_left_begin[$index] ;
 	}
-	# if contante index -> no loop iter index 
-	$MNH_slide_left_index[$index] = $MNH_slide_left_begin[$index] if ( ! $MNH_slide_left_on[$index] ) ;
     }
     $indice =  join ("," , @MNH_slide_left_index) ;
     return "$array($indice)";
@@ -377,69 +384,25 @@ sub Set_slide_right
     foreach $slide (@MNH_slide_right_begin)
     {
 	$index ++ ;
-	# remove left/default bound if itentical 
-	if ( $MNH_slide_right_begin[$index] eq $MNH_slide_left_begin[$index]  ) {
-	    $MNH_slide_right_index[$index] = $MNH_slide_default_name[$index] ;
+	$slide_on = $MNH_slide_right_on[$index] ;
+	if ( $slide_on ) {
+	    # remove left/default bound if itentical 
+	    if ( $MNH_slide_right_begin[$index] eq $MNH_slide_left_begin[$index]  ) {
+		$MNH_slide_right_index[$index] = $MNH_slide_default_name[$index] ;
+	    }
+	    else {
+		$MNH_slide_right_index[$index] = "$MNH_slide_default_name[$index]+$MNH_slide_right_begin[$index]-($MNH_slide_left_begin[$index]) " ;
+	    }
 	}
 	else {
-	    $MNH_slide_right_index[$index] = "$MNH_slide_default_name[$index]+$MNH_slide_right_begin[$index]-($MNH_slide_left_begin[$index]) " ;
+	    # if contante index -> no loop iter index
+	    $MNH_slide_right_index[$index] = $MNH_slide_right_begin[$index] ;
 	}
-	# if contante index -> no loop iter index 
-	$MNH_slide_right_index[$index] = $MNH_slide_right_begin[$index] if ( ! $MNH_slide_right_on[$index] ) ;
     }
     $indice =  join ("," , @MNH_slide_right_index) ;
-    return "$array($indice)" ;
-    
+    return "$array($indice)" ;  
 }
 Function::AddFunction("set_slide_right", "MNH::Set_slide_right");
-
-########################################################################
-# Add all input, usage: - ANY NUMBER OF INPUTS
-# Add(a, b, ....)
-########################################################################
-sub Add
-{
-    my $sum = 0;
-    my $arg;
-    foreach $arg (@_) { $sum += $arg; }
-    return $sum;
-}
-Function::AddFunction("add", "MNH::Add");
-
-########################################################################
-# Subtract b from a, usage: - TWO INPUTS ONLY
-# Sub(a, b)
-########################################################################
-sub Sub
-{
-    my ($a, $b) = @_;
-    return $a - $b;
-}
-Function::AddFunction("sub", "MNH::Sub");
-########################################################################
-# Rand(a) - returns a random fractional number in range 0 to a,
-# if a is ommitted, number is in range 0 to 1
-# Rand(a)
-########################################################################
-sub Rand
-{
-    if($_[0]) { return 2*($_[0]); }
-    return -1 ;
-}
-Function::AddFunction("rand", "MNH::Rand");
-########################################################################
-# Abs(a) - returns the absoulte value of a
-# Abs(a)
-########################################################################
-sub Abs
-{
-    my $a = shift;
-    return abs($a);
-}
-Function::AddFunction("abs", "MNH::Abs");
-
-
-
 
 return 1;
 ########################################################################
