@@ -9,7 +9,7 @@
 
 Filepp  OPTIONS file.F90 > file.f90
 
-# Les OPTIONS sont principalement de déclaration de marcro
+# Les OPTIONS sont principalement des déclarations de marcro
 # compatible CPP  : -Dclef
 #
 # /!\ au "F" majuscule 'F'ilepp ,
@@ -87,10 +87,7 @@ Where + Array Syntaxe
 Filepp  -DMNH_EXPAND -DMNH_EXPAND_LOOP compute_entr_detr.F90 > compute_entr_detr.f90
 
 #
-# REM1 : Pour le moment , beta test , les fichiers fortran a tester '*.F90' doivent etre dans
-#        le repetoire 'MNH_Expand_Array' 
-#
-# REM2 : Attention , cet outil est très bete !!!
+# REM1 : Attention , cet outil est très bete !!!
 #
 #  Pour le moment l'array syntaxe et convertie en boucle fusionné
 #  <-> toutes les lignes dans un seul bloque do ... enddo
