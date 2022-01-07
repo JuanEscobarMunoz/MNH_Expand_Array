@@ -1,10 +1,10 @@
 #pragma filepp UseModule bigfunc.pm
 #pragma filepp UseModule regexp.pm
-#pragma filepp SetMacroPrefix !$mnh 
+#comment pragma filepp SetMacroPrefix !$mnh 
 
 #ifdef MNH_EXPAND
 
-#bigfunc expand_array(DOMAINE...)
+#bigfunc !$mnh_expand_array(DOMAINE...)
 ! begin expand_array[DOMAINE]
  @D(DOMAINE)
 #regexp /(\w+)\(([^()]*:+[^()]*)\)/\@R($1($2))/
@@ -12,7 +12,7 @@
 #regexp /(\@\@L)\((.*)\)/\@$2/
 #endbigfunc
 
-#bigfunc end_expand_array(DOMAINE...)
+#bigfunc !$mnh_end_expand_array(DOMAINE...)
 #rmregexp /(\@\@L)\((.*)\)/\@$2/
 #rmregexp /(\@R)(.*=.*)/\@L$2/
 #rmregexp /(\w+)\(([^()]*:+[^()]*)\)/\@R($1($2))/
@@ -20,7 +20,7 @@
 ! end expand_array[DOMAINE]
 #endbigfunc
 
-#bigfunc expand_where(DOMAINE...)
+#bigfunc !$mnh_expand_where(DOMAINE...)
 ! begin expand_where[DOMAINE]
   @D(DOMAINE)
 #regexp /(\w+)\(([^()]*:+[^()]*)\)/\@R($1($2))/
@@ -33,7 +33,7 @@
 #regexp /(WHERE)(.*)/IF $2 THEN/
 #endbigfunc
 
-#bigfunc end_expand_where(DOMAINE...)
+#bigfunc !$mnh_end_expand_where(DOMAINE...)
 #rmregexp /(\w+)\(([^()]*:+[^()]*)\)/\@R($1($2))/
 #rmregexp /(\@R)(.*=.*)/\@L$2/
 #rmregexp /(\@\@L)\((.*)\)/\@$2/
