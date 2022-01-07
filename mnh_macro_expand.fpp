@@ -35,7 +35,7 @@
 #regexp /(ELSE *WHERE)(.*)/ELSE $2 /
 #regexp /(END *WHERE)(.*)/ENDIF $2 /
 #comment replace wrong :: where @R -> where @L
-#regexp /(WHERE.*?)(\@R?)/$1\@L/
+#regexp /(WHERE.*?)(\@R\(?)/$1\@L\(/
 #regexp /(WHERE)(.*)/IF $2 THEN/
 #endbigfunc
 
@@ -46,7 +46,7 @@
 #rmregexp /(ELSE *WHERE)(.*:+.*)/ELSEIF $2 THEN/
 #rmregexp /(ELSE *WHERE)(.*)/ELSE $2 /
 #rmregexp /(END *WHERE)(.*)/ENDIF $2 /
-#rmregexp /(WHERE.*?)(\@R?)/$1\@L/
+#rmregexp /(WHERE.*?)(\@R\(?)/$1\@L\(/
 #rmregexp /(WHERE)(.*)/IF $2 THEN/
  @E(DOMAINE)
 ! end expand_where[DOMAINE]
