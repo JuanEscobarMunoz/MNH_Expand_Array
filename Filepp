@@ -7,4 +7,4 @@ while [[ $# -gt 1 ]]; do
 done
 FILE=$1
 
-filepp ${OPT} -imacros mnh_macro_expand.fpp ${OPT} ${FILE} | filepp ${OPT} -imacros mnh_macro_array_loop.fpp -M. -m MNH.pm -c 
+filepp ${OPT} -imacros mnh_macro_expand.fpp ${FILE} | filepp ${OPT} -imacros mnh_macro_array_loop.fpp -M. -m MNH.pm -c 
