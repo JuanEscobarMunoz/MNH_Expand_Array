@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # MNH_Expand_Array : Juan ESCOBAR
 #
