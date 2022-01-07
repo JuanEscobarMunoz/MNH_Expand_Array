@@ -1,4 +1,41 @@
 #
+# MNH_Expand_Array : Juan ESCOBAR
+#
+# quelques scripts perl/bash utilisant "filepp" pour convertir
+# l'array syntaxe fortran en bloucle DO imbriqué ou DO CONCURRENT
+#
+
+#
+#  Prérequis installation de filepp ( et perl )
+#  REM: certaine version de Linux on un package pour cela 
+#
+#  par exemple dans l'espace utilisateur <-> quelques secondes ...
+
+export FILEPP=~/PATCH/FILEPP
+mkdir -p ${FILEPP}
+cd ${FILEPP}
+wget https://www-users.york.ac.uk/~dm26/filepp/filepp-1.8.0.tar.gz
+tar xvf filepp-1.8.0.tar.gz
+cd filepp-1.8.0
+./configure --prefix=${FILEPP}/FILEPP-1.8.0
+make install
+
+#
+# Positionnement de l'environnement pour utiliser filepp
+#
+export PATH=${FILEPP}/FILEPP-1.8.0/bin:${PATH}
+export MANPATH=${FILEPP}/FILEPP-1.8.0/share/man:${MANPATH}
+
+# test de l'installation
+filepp -h
+man filepp
+
+###############################################################################
+#
+#  Quelques Infos pour le developpement test de ces scripts filepp
+#
+###############################################################################
+#
 # Pour faire du perl interactif , demmarrer le mode debugger
 #
 perl -d -e 1
