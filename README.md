@@ -5,9 +5,18 @@
 # quelques scripts perl/bash utilisant "filepp" pour convertir
 # l'array syntaxe fortran en bloucle DO imbriqué ou DO CONCURRENT
 #
+# Usage
+
+Filepp  OPTIONS file.F90 > file.f90
+
+# Les OPTIONS sont principalement de déclaration de marcro
+# compatible CPP  : -Dclef
+#
+# /!\ au "F" majuscule 'F'ilepp ,
+# /!\ enrobage de la commande de base 'f'ilepp avec un "f" minuscle
 
 #
-#  Prérequis installation de filepp ( et perl )
+#  Prérequis installation de "filepp" ( et perl )
 #  REM: certaine version de Linux on un package pour cela 
 #
 #  par exemple dans l'espace utilisateur <-> quelques secondes ...
@@ -33,7 +42,69 @@ man filepp
 
 ###############################################################################
 #
-#  Quelques Infos pour le developpement test de ces scripts filepp
+#  Utilisation , Beta Test
+#
+###############################################################################
+#
+# 4 directives ( pour le moment ) permettent de convertir l'array en boucle DO nesté
+# ou DO CONCURRENT
+#
+# Cf l'exemple fourni compute_entr_detr.F90
+#
+#
+# Pour de l'array syntaxe
+#
+!$mnh_expand_array(ii=iib:iie:ip , ij=i2jb:ije , ik=ikb:ike:iks)
+
+Array synatxe
+
+!$mnh_end_expand_array(Commentaire)
+
+#
+# Pour les Where
+#
+!$mnh_expand_where(ii=iib:iie:ip , ij=i2jb:ije , ik=ikb:ike:iks)
+
+Where + Array Syntaxe
+
+!$mnh_end_expand_where(Commentaire)
+
+#
+# Script Filepp = lancement 2 commandes filepp + options + fichier d'entrée
+#
+# options
+#
+#   -DMNH_EXPAND : active la transformation (sinon rien ne se passe <-> commentaire dans le code )
+#                 et permet aussi de déclarer/initialiser
+#                 les variable de boucles <-> cf "#ifdef MNH_EXPAND" dans l'exemple
+#
+#
+#   -DMNH_EXPAND_LOOP : convertie l'array syntaxe en DO imbriqué , sinon par défaut
+#                       la conversion est faite en DO CONCURRENT
+#
+# Exemple
+
+Filepp  -DMNH_EXPAND -DMNH_EXPAND_LOOP compute_entr_detr.F90 > compute_entr_detr.f90
+
+#
+# REM1 : Pour le moment , beta test , les fichiers fortran a tester '*.F90' doivent etre dans
+#        le repetoire 'MNH_Expand_Array' 
+#
+# REM2 : Attention , cet outil est très bete !!!
+#
+#  Pour le moment l'array syntaxe et convertie en boucle fusionné
+#  <-> toutes les lignes dans un seul bloque do ... enddo
+#  donc a l'utilisateur de vérifier que les calculs en ARRAY syntaxe
+#  n'introduise pas de dépendance d'une ligne a l'autre
+#  ( ce qui ne devrait pas etre le problème pour la physique en colonne )
+#
+#  -> Une option supplémentaire -DMNH_EXPAND_NOFUSE , et en cours
+#     de développement pour l'ARRAY syntaxe ( sans  where)
+#     qui écrira une boucle par ligne d'array syntaxe
+# 
+###############################################################################
+#
+#  Quelques Infos , sous le capot , pour le developpement test de ces scripts filepp
 #
 ###############################################################################
 #
