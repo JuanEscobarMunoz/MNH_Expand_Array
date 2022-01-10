@@ -8,4 +8,4 @@ while [[ $# -gt 1 ]]; do
 done
 FILE=$1
 
-filepp ${OPT}  -lc '&' -lr '&&' -imacros ${DIRNAME}/mnh_macro_expand.fpp ${FILE} | filepp ${OPT} -imacros ${DIRNAME}/mnh_macro_array_loop.fpp -M${DIRNAME} -m MNH.pm -c 
+filepp ${OPT}  -lc '&' -lr '&#&' -imacros ${DIRNAME}/mnh_macro_expand.fpp ${FILE} | filepp ${OPT} -imacros ${DIRNAME}/mnh_macro_array_loop.fpp -M${DIRNAME} -m MNH.pm -c 
