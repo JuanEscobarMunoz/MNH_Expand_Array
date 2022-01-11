@@ -4,5 +4,5 @@
 #define @E(args...) get_slide_default(args)
 
 #pragma filepp UseModule regexp.pm
-#regexp /&#&/&\n/
+#regexp /@#@/&\n/
 

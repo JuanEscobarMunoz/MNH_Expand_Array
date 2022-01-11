@@ -1,11 +1,22 @@
 #!/bin/bash
 export DIRNAME=$(dirname $(which $0))
 #get opt + filename
-OPT=""
-while [[ $# -gt 1 ]]; do
-    OPT+=" $1"
-    shift 
+OPT_FILEPP=""
+OPT_CPP=""
+
+while [[ $# -gt 1 ]]; do    
+    OPT_CPP+=" $1"
+    case $1 in
+	-DMNH_EXPAND*)
+	    OPT_FILEPP+=" $1"
+	    ;;
+    esac
+    shift      
 done
 FILE=$1
 
-filepp ${OPT}  -lc '&' -lr '&#&' -imacros ${DIRNAME}/mnh_macro_expand.fpp ${FILE} | filepp ${OPT} -imacros ${DIRNAME}/mnh_macro_array_loop.fpp -M${DIRNAME} -m MNH.pm -c 
+#echo OPT_FILEPP=${OPT_FILEPP}
+#echo OPT_CPP=${OPT_CPP}
+#echo FILE=${FILE}
+
+filepp -w ${OPT_CPP} ${FILE} | filepp ${OPT_FILEPP}  -lc '&' -lr '@#@' -imacros ${DIRNAME}/mnh_macro_expand.fpp -c | filepp ${OPT_FILEPP} -imacros ${DIRNAME}/mnh_macro_array_loop.fpp -M${DIRNAME} -m MNH.pm -c 
