@@ -5,9 +5,13 @@
 # quelques scripts perl/bash utilisant "filepp" pour convertir
 # l'array syntaxe fortran en bloucle DO imbriqué ou DO CONCURRENT
 #
+# Set PATH
+
+export PATH={...path_vers}/MNH_Expand_Array:${PATH}
+
 # Usage
 
-Filepp  OPTIONS file.F90 > file.f90
+Filepp [OPTIONS] file.F90 > file.f90
 
 # Les OPTIONS sont principalement des déclarations de marcro
 # compatible CPP  : -Dclef
@@ -70,7 +74,7 @@ Where + Array Syntaxe
 !$mnh_end_expand_where(Commentaire)
 
 #
-# Script Filepp = lancement 2 commandes filepp + options + fichier d'entrée
+# Script Filepp = lancement 3 commandes filepp pipiliné + options + fichier d'entrée
 #
 # options
 #
@@ -98,7 +102,15 @@ Filepp  -DMNH_EXPAND -DMNH_EXPAND_LOOP compute_entr_detr.F90 > compute_entr_detr
 #  -> Une option supplémentaire -DMNH_EXPAND_NOFUSE , et en cours
 #     de développement pour l'ARRAY syntaxe ( sans  where)
 #     qui écrira une boucle par ligne d'array syntaxe
-# 
+#
+#
+# REM2 : Première version testé avec MesoNH complet = compilation OK
+#        en remplacant dans les fichiers 'Rules.LX...mk'
+#
+CPP = cpp -P -traditional -Wcomment
+# par
+CPP = Filepp
+#
 ###############################################################################
 #
 #  Quelques Infos , sous le capot , pour le developpement test de ces scripts filepp
