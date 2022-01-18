@@ -11,13 +11,15 @@ export PATH={...path_vers}/MNH_Expand_Array:${PATH}
 
 # Usage
 
-Filepp [OPTIONS] file.F90 > file.f90
+mnh_expand [OPTIONS] file.F90 > file.f90
 
-# Les OPTIONS sont principalement des déclarations de marcro
+# Les OPTIONS sont principalement des déclarations de macro
 # compatible CPP  : -Dclef
+# Les options sont séparer entre les options pour CPP classique et les extensions fileppe  via  -DMNH_EXPAND*
 #
-# /!\ au "F" majuscule 'F'ilepp ,
-# /!\ enrobage de la commande de base 'f'ilepp avec un "f" minuscle
+# /!\ Le script 'Filepp' , a été renommé mnh_expand 
+# /!\ pour éviter des problèmes sur MacOS qui confond les noms
+# /!\ des scripts écrit en minuscule/Majuscule 
 
 #
 #  Prérequis installation de "filepp" ( et perl )
@@ -74,7 +76,7 @@ Where + Array Syntaxe
 !$mnh_end_expand_where(Commentaire)
 
 #
-# Script Filepp = lancement 3 commandes filepp pipiliné + options + fichier d'entrée
+# Script mnh_expand = lancement 3 commandes filepp pipiliné + options + fichier d'entrée
 #
 # options
 #
@@ -88,7 +90,7 @@ Where + Array Syntaxe
 #
 # Exemple
 
-Filepp  -DMNH_EXPAND -DMNH_EXPAND_LOOP compute_entr_detr.F90 > compute_entr_detr.f90
+mnh_expand  -DMNH_EXPAND -DMNH_EXPAND_LOOP compute_entr_detr.F90 > compute_entr_detr.f90
 
 #
 # REM1 : Attention , cet outil est très bete !!!
@@ -109,7 +111,7 @@ Filepp  -DMNH_EXPAND -DMNH_EXPAND_LOOP compute_entr_detr.F90 > compute_entr_detr
 #
 CPP = cpp -P -traditional -Wcomment
 # par
-CPP = Filepp
+CPP = mnh_expand
 #
 ###############################################################################
 #
@@ -148,6 +150,6 @@ filepp -DMNH_EXPAND -imacros mnh_macro_expand.fpp titi.F90 | filepp -imacros mnh
 #
 filepp -DMNH_EXPAND -imacros mnh_macro_expand.fpp compute_entr_detr.F90 | filepp -DMNH_EXPAND_LOOP -imacros mnh_macro_array_loop.fpp -M. -m MNH.pm -c >& compute_entr_detr.f90 ; sdiff -w270 compute_entr_detr.F90 compute_entr_detr.f90 | less
 #
-# Script Filepp = lancement des 2 commandes filepp + options + fichier d'entrée
+# Script mnh_expand = lancement les 3 commandes filepp + options + fichier d'entrée
 #
-Filepp  -DMNH_EXPAND -DMNH_EXPAND_LOOP compute_entr_detr.F90 > compute_entr_detr.f90 2>error
+mnh_expand  -DMNH_EXPAND -DMNH_EXPAND_LOOP compute_entr_detr.F90 > compute_entr_detr.f90 2>error
