@@ -6,7 +6,7 @@
 
 #bigfunc !$mnh_expand_array(DOMAINE...)
 ! begin expand_array[DOMAINE]
- @D(DOMAINE)
+@D(DOMAINE)
 #comment replace :: A(:) -> @R(A(:))
 #regexp /(\w+)\(([^()]*:+[^()]*)\)/\@R($1($2))/
 #comment previous regexp doesnt identify Left/Right Array 
@@ -20,17 +20,19 @@
 #rmregexp /(\@\@L)\((.*)\)/\@$2/
 #rmregexp /(\@R)(.*=.*)/\@L$2/
 #rmregexp /(\w+)\(([^()]*:+[^()]*)\)/\@R($1($2))/
- @E(DOMAINE)
+@E(DOMAINE)
 ! end expand_array[DOMAINE]
 #endbigfunc
 
 #bigfunc !$mnh_expand_where(DOMAINE...)
 ! begin expand_where[DOMAINE]
-  @D(DOMAINE)
+@D(DOMAINE)
 #regexp /(\w+)\(([^()]*:+[^()]*)\)/\@R($1($2))/
 #regexp /(\@R)(.*=.*)/\@L$2/
 #regexp /(\@\@L)\((.*)\)/\@$2/
 #comment replace :: elsewhere (something) -> elseif (something) then
+#regexp /where/WHERE/
+#regexp /else/ELSE/
 #regexp /(ELSE *WHERE)(.*:+.*)/ELSEIF $2 THEN/
 #regexp /(ELSE *WHERE)(.*)/ELSE $2 /
 #regexp /(END *WHERE)(.*)/ENDIF $2 /
@@ -43,12 +45,14 @@
 #rmregexp /(\w+)\(([^()]*:+[^()]*)\)/\@R($1($2))/
 #rmregexp /(\@R)(.*=.*)/\@L$2/
 #rmregexp /(\@\@L)\((.*)\)/\@$2/
+#rmregexp /where/WHERE/
+#rmregexp /else/ELSE/
 #rmregexp /(ELSE *WHERE)(.*:+.*)/ELSEIF $2 THEN/
 #rmregexp /(ELSE *WHERE)(.*)/ELSE $2 /
 #rmregexp /(END *WHERE)(.*)/ENDIF $2 /
 #rmregexp /(WHERE.*?)(\@R\(?)/$1\@L\(/
 #rmregexp /(WHERE)(.*)/IF $2 THEN/
- @E(DOMAINE)
+@E(DOMAINE)
 ! end expand_where[DOMAINE]
 #endbigfunc
 
