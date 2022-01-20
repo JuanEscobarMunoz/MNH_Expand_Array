@@ -76,6 +76,22 @@ Where + Array Syntaxe
 !$mnh_end_expand_where(Commentaire)
 
 #
+# /!\ Quelques limites pour les WHERE (pour le moment)
+# /!\
+# /!\  - Les lignes de continuation doivent finir par "&" + suivi immédiatement par retour a la ligne
+# /!\      -> "WHERE ... &{blanc}{blanc}" , ne marche pas !!!
+# /!\
+# /!\  - Pas de commentaire en fin de ligne 
+# /!\       -> "WHERE ... ! commentaire" ne fonctionne pas !!!
+# /!\        mettre le commentaire avant ou après le WHERE
+# /!\
+# /!\  - Les "WHERE (condition) A(:) =..." sur une seule ligne , sans END WHERE , ne fonctionne pas !!!
+# /!\      -> a remplacer par
+# /!\        WHERE (conditio)
+# /!\          A(:)= ...
+# /!\        END WHERE
+#
+#
 # Script mnh_expand = lancement 3 commandes filepp pipiliné + options + fichier d'entrée
 #
 # options
