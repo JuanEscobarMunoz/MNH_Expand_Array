@@ -114,6 +114,7 @@ sub Set_slide_default
     my $do_list = "" ;
     if(Filepp::Ifdef("MNH_EXPAND_LOOP")) {
 	my $indice = "" ;
+	my $indent = 0 ;
 	foreach $slide (@MNH_slide_default_begin)
 	{
 	    $slide_on = $MNH_slide_default_on[$index] ;
@@ -124,10 +125,13 @@ sub Set_slide_default
 		$slide_step  = $MNH_slide_default_step[$index] ;
 		$indice = "$slide_name=$slide_begin,$slide_end" ;
 		$indice .= ",$slide_step" if ( $slide_step ne "1" ) ;
+		#add space before do for identation
+		for ( my $i=0;$i<$indent;$i++ ) { $do_list .= " " } ; 
 		$do_list .= "DO $indice " ;
-		$do_list .= " ; " if ( $index != 0 ) ;
+		$do_list .= "\n" if ( $index != 0 ) ;
+		$indent++ ;		
 	    }
-	    $index-- ;
+	    $index-- ; 
 	}
 	#print "\n" ;
        }
@@ -155,13 +159,17 @@ sub Get_slide_default
 	my $size = @MNH_slide_default_begin ;
 	my $slide ;
 	my $slide_on ;
+	my $indent = $size-1 ;
 	foreach $slide (@MNH_slide_default_begin)
 	{
 	    $index++ ;
 	    $slide_on = $MNH_slide_default_on[$index] ;
 	    if ( $slide_on ) {
+		#add space before do for identation
+		for ( my $i=0;$i<$indent;$i++ ) { $enddo_list .= " " } ;
 		$enddo_list .= "ENDDO" ;
-		$enddo_list .= " ; " if ( $index < $size-1 ) ;
+		$enddo_list .= "\n" if ( $index < $size-1 ) ;
+		$indent-- ;
 	    }
 	}
 	#$enddo_list .= "! [$arg]" ;	
