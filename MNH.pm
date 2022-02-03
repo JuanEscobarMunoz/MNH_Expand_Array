@@ -164,10 +164,10 @@ sub Get_slide_default
 		$enddo_list .= " ; " if ( $index < $size-1 ) ;
 	    }
 	}
-	$enddo_list .= "! [$arg]" ;	
+	#$enddo_list .= "! [$arg]" ;	
     }
     else {
-	$enddo_list = "ENDDO ! CONCURRENT [$arg]" ;
+	$enddo_list = "ENDDO" ; # ! CONCURRENT [$arg]" ;
     }
     return $enddo_list ; 
 }

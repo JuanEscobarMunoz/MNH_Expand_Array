@@ -5,5 +5,5 @@
 
 #pragma filepp UseModule regexp.pm
 #regexp /@#@/&\n/
-#regexp /^\s*$//
+#comment regexp /^\s*$//
 
