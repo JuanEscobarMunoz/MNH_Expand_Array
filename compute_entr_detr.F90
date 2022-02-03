@@ -155,11 +155,23 @@ REAL, DIMENSION(SIZE(PTHLM,1)) :: ZDZ_STOP,&           ! Exact Height of the LCL
 INTEGER :: JI
 
 !----------------------------------------------------------------------------------
-#ifdef MNH_EXPAND
+@ifdef MNH_EXPAND
+! macro with @
 INTEGER :: JLOOP , JLOOPU
+@endif
+@define MORE_MACRO_WITH@
+@ifdef MORE_MACRO_WITH@
+! more macro with @
+@endif
+
+#ifdef MNH_EXPAND
+! macro with #
 JLOOPU = SIZE(PTHLM,1)
-#endif 
-                        
+#endif
+#define MORE_MACRO_WITH#
+#ifdef MORE_MACRO_WITH#
+! more macro with #
+#endif
 !                1.3 Initialisation
   REAL(KIND=JPRB) :: ZHOOK_HANDLE
   IF (LHOOK) CALL DR_HOOK('COMPUTE_ENTR_DETR',0,ZHOOK_HANDLE)
@@ -177,7 +189,7 @@ JLOOPU = SIZE(PTHLM,1)
 
 !                1.4 Estimation of PPART_DRY
 !$mnh_expand_where(JLOOP=1:JLOOPU)  
-  WHERE(OTEST(:))
+  where(OTEST(:))
     WHERE(OTESTLCL(:))
       !No dry part when condensation level is reached
       PPART_DRY(:)=0.

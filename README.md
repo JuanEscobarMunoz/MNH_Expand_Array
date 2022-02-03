@@ -104,9 +104,24 @@ Where + Array Syntaxe
 #   -DMNH_EXPAND_LOOP : convertie l'array syntaxe en DO imbriqué , sinon par défaut
 #                       la conversion est faite en DO CONCURRENT
 #
-# Exemple
+#   -DMNH_EXPAND_NOCPP : convertie l'array syntaxe , mais conserve toutes les directives CPP
+#                        "#ifdef" "#define" , etc ...
+#                        -> dans ce cas il faut utiliser des "@" soit "@ifdef" "@define" etc...
+#                        dans la code si l'on veux activer du preprocessing
+#                          <-> cf  "@ifdef MNH_EXPAND" dans l'exemple
+#
+#
+#Exemples
+#
+# preprocessing CPP + expansion de l'array syntax convertie en do nesté
+#
 
 mnh_expand  -DMNH_EXPAND -DMNH_EXPAND_LOOP compute_entr_detr.F90 > compute_entr_detr.f90
+
+#
+# conservation de macro "#..." mais expansion de l'array synatx en do concurrent
+#
+mnh_expand -DMNH_EXPAND_NOCPP -DMNH_EXPAND  compute_entr_detr.F90 > compute_entr_detr.f90
 
 #
 # REM1 : Attention , cet outil est très bete !!!
@@ -128,6 +143,15 @@ mnh_expand  -DMNH_EXPAND -DMNH_EXPAND_LOOP compute_entr_detr.F90 > compute_entr_
 CPP = cpp -P -traditional -Wcomment
 # par
 CPP = mnh_expand
+#
+#
+# REM3 : si l'on veux activer a la fois les directives avec "@" et "#"
+#        et par exemple utiliser "ifdef MNH_EXPAND" il faut utilise la syntaxe
+#       -Dmacro=macro
+#
+# mnh_expand  -DMNH_EXPAND=MNH_EXPAND compute_entr_detr.F90 > compute_entr_detr.f90
+#
+#   sinon le noms de la macro 'disparait' dans le 'ifdef ...'
 #
 ###############################################################################
 #

@@ -3,10 +3,14 @@ export DIRNAME=$(dirname $(which $0))
 #get opt + filename
 OPT_FILEPP=""
 OPT_CPP=""
-
+#option to bypass CCP #macro -> replace # by @ in macro definition
+NO_CPP=""
 while [[ $# -gt 1 ]]; do    
     OPT_CPP+=" $1"
     case $1 in
+	-DMNH_EXPAND_NOCPP)
+	    NO_CPP="-kc @"
+	    ;;	
 	-DMNH_EXPAND*)
 	    OPT_FILEPP+=" $1"
 	    ;;
@@ -19,4 +23,6 @@ FILE=$1
 #echo OPT_CPP=${OPT_CPP}
 #echo FILE=${FILE}
 
-filepp -w ${OPT_CPP} ${FILE} | filepp ${OPT_FILEPP}  -lc '&' -lr '@#@' -imacros ${DIRNAME}/mnh_macro_expand.fpp -c | filepp ${OPT_FILEPP} -imacros ${DIRNAME}/mnh_macro_array_loop.fpp -M${DIRNAME} -m MNH.pm -c 
+#set -x
+
+filepp  ${NO_CPP} -w ${OPT_CPP} ${FILE} | filepp ${OPT_FILEPP}  -lc '&' -lr '@#@' -imacros ${DIRNAME}/mnh_macro_expand.fpp -c | filepp ${OPT_FILEPP}  -imacros ${DIRNAME}/mnh_macro_array_loop.fpp -M${DIRNAME} -m MNH.pm -c 

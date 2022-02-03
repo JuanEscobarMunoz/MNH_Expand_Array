@@ -7,3 +7,4 @@
 #regexp /@#@/&\n/
 #comment regexp /^\s*$//
 
+#pragma filepp SetKeywordchar @
