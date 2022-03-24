@@ -25,6 +25,9 @@
 #  Description  :  Allows easy definition of multi-line macros
 #  Licence      :  GNU copyleft
 #
+# Modifications
+# 24/03/2022::Juan Escobar: bug correction : remove last \n <-> unnecessary new line
+#
 ########################################################################
 # THIS IS A FILEPP MODULE, YOU NEED FILEPP TO USE IT!!!
 # usage: filepp -m bigdef.pm <files>
@@ -88,6 +91,10 @@ sub Endbigdef
     }
     # remove processor
     Filepp::RemoveProcessor("Bigdef::Processor");
+ 
+    #24/03/2022::Juan Escobar: bug correction : remove last \n <-> unnecessary new line
+    $currentdef =~ s/(.*)(\n$)/$1/ ;
+    
     # define macro
     Filepp::Define($currentdef);
     $currentdef = "";

@@ -25,6 +25,9 @@
 #  Description  :  This allows last minute processing of stuff
 #  Licence      :  GNU copyleft
 #
+# Modifications
+# 24/03/2022::Juan Escobar: bug correction : remove last \n <-> unnecessary new line
+#
 ########################################################################
 # THIS IS A FILEPP MODULE, YOU NEED FILEPP TO USE IT!!!
 # usage: filepp -m bigfunc.pm <files>
@@ -126,6 +129,9 @@ sub Run
 	# run processing chain before here to catch up
 	$output .= Filepp::RunProcessors($Input[$i++]."\n", 1);
     }
+
+    #24/03/2022::Juan Escobar: bug correction : remove last \n <-> unnecssary new line
+    $output =~ s/(.*)(\n$)/$1/ ;
     
     return $output;
 }
