@@ -25,4 +25,6 @@ FILE=$1
 
 #set -x
 
-filepp  ${NO_CPP} -w ${OPT_CPP} ${FILE} | filepp ${OPT_FILEPP}  -lc '&' -lr '@#@' -imacros ${DIRNAME}/mnh_macro_expand.fpp -c | filepp ${OPT_FILEPP}  -imacros ${DIRNAME}/mnh_macro_array_loop.fpp -M${DIRNAME} -m MNH.pm -c 
+filepp  ${NO_CPP} -w ${OPT_CPP} ${FILE} | \
+    filepp ${OPT_FILEPP} -M${DIRNAME} -imacros ${DIRNAME}/mnh_macro_expand.fpp     -c -lc '&' -lr '@#@' | \
+    filepp ${OPT_FILEPP} -M${DIRNAME} -imacros ${DIRNAME}/mnh_macro_array_loop.fpp -c 
