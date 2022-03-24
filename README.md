@@ -5,6 +5,9 @@
 # quelques scripts perl/bash utilisant "filepp" pour convertir
 # l'array syntaxe fortran en bloucle DO imbriqué ou DO CONCURRENT
 #
+# Modif ::
+# version MNH_EXPAND_1-1-1 :: Juan 24/03/2022:: Bug correct : remove unnecessary new line in macro output 
+#
 # Set PATH
 
 export PATH={...path_vers}/MNH_Expand_Array:${PATH}
