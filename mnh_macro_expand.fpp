@@ -1,4 +1,4 @@
-#pragma filepp UseModule bigfunc.pm
+#pragma filepp UseModule MNH_bigfunc.pm
 #pragma filepp UseModule regexp.pm
 #comment pragma filepp SetMacroPrefix !$mnh 
 #pragma filepp SetKeywordchar @
@@ -28,18 +28,23 @@
 @bigfunc !$mnh_expand_where(DOMAINE...)
 @comment ! begin expand_where
 @D(DOMAINE)
-@comment put @R around (...:...)
+@comment replace :: A(:) -> @R(A(:))
 @regexp /(\w+)\(([^()]*:+[^()]*)\)/\@R($1($2))/
+@comment previous regexp doesnt identify Left/Right Array 
+@comment so :: replace @R(A(:)) = ... -> @L(A(:)) = ...
 @regexp /(\@R)(.*=.*)/\@L$2/
+@comment same for @D incorrectly replace :: @@LD -> @D
 @regexp /(\@\@L)\((.*)\)/\@$2/
-@comment replace :: elsewhere (something) -> elseif (something) then
+@comment lower -> UPPER case
 @regexp /^( *)where/$1WHERE/
 @regexp /^( *)else/ELSE/
+@comment replace :: elsewhere (something) -> elseif (something) then
 @regexp /(ELSE *WHERE)(.*:+.*)/ELSEIF$2THEN/
 @regexp /(ELSE *WHERE)(.*)/ELSE$2/
 @regexp /(END *WHERE)(.*)/ENDIF$2/
 @comment replace wrong :: where @R -> where @L
 @regexp /(WHERE.*?)(\@R\(?)/$1\@L\(/
+@comment replace :: where (something) -> if (something) then
 @regexp /(WHERE)(.*)/IF$2THEN/
 @endbigfunc
 
