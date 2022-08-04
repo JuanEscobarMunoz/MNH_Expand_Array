@@ -139,7 +139,7 @@ sub Set_slide_default
 	#print "\n" ;
        }
        else {
-	   $arg  = join ("," , @_) ;
+	   $arg  = join ("," , reverse(@_) ) ;
 	   $do_list = "DO CONCURRENT ($arg)" ;
        }
        return $do_list ;    
