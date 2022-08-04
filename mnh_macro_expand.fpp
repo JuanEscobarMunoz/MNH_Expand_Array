@@ -9,7 +9,7 @@
 @comment ! begin expand_array[DOMAINE]
 @D(DOMAINE)
 @comment replace :: A(:) -> @R(A(:))
-@regexp /(\w+)\(([^()]*:+[^()]*)\)/\@R($1($2))/
+@regexp /(\w+) *\(([^()]*:+[^()]*)\)/\@R($1($2))/
 @comment previous regexp doesnt identify Left/Right Array 
 @comment so :: replace @R(A(:)) = ... -> @L(A(:)) = ...
 @regexp /(\@R)(.*=.*)/\@L$2/
@@ -20,7 +20,7 @@
 @bigfunc !$mnh_end_expand_array(DOMAINE...)
 @rmregexp /(\@\@L)\((.*)\)/\@$2/
 @rmregexp /(\@R)(.*=.*)/\@L$2/
-@rmregexp /(\w+)\(([^()]*:+[^()]*)\)/\@R($1($2))/
+@rmregexp /(\w+) *\(([^()]*:+[^()]*)\)/\@R($1($2))/
 @E(DOMAINE)
 @comment ! end expand_array[DOMAINE]
 @endbigfunc
@@ -29,7 +29,7 @@
 @comment ! begin expand_where
 @D(DOMAINE)
 @comment replace :: A(:) -> @R(A(:))
-@regexp /(\w+)\(([^()]*:+[^()]*)\)/\@R($1($2))/
+@regexp /(\w+) *\(([^()]*:+[^()]*)\)/\@R($1($2))/
 @comment previous regexp doesnt identify Left/Right Array 
 @comment so :: replace @R(A(:)) = ... -> @L(A(:)) = ...
 @regexp /(\@R)(.*=.*)/\@L$2/
@@ -49,7 +49,7 @@
 @endbigfunc
 
 @bigfunc !$mnh_end_expand_where(DOMAINE...)
-@rmregexp /(\w+)\(([^()]*:+[^()]*)\)/\@R($1($2))/
+@rmregexp /(\w+) *\(([^()]*:+[^()]*)\)/\@R($1($2))/
 @rmregexp /(\@R)(.*=.*)/\@L$2/
 @rmregexp /(\@\@L)\((.*)\)/\@$2/
 @rmregexp /^( *)where/$1WHERE/
