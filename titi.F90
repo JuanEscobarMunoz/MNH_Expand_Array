@@ -21,7 +21,7 @@ Fct(D(iib-1:,ijb-1:,:))
  
  !$mnh_expand_array(ii1=iib:iie:ip , ij=i2jb:ije , ik=ikb:ike:iks) 
 
-    F(iib:iie:ip,i2jb:ije,k) =  D ( iib:iie:ip , i2jb:ije , k ) + Fct(D(iib-1:,ijb-1:,:))
+    F (iib:iie:ip,i2jb:ije,:) =  D ( iib:iie:ip , i2jb:ije , : ) + Fct(D(iib-1:,ijb-1:,:))
     C( iib: iie :ip , i2jb: ije , k)
 
     D( i: , j,k )
