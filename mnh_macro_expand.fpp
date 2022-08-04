@@ -63,6 +63,14 @@
 @comment ! end expand_where[DOMAINE]
 @endbigfunc
 
+@bigfunc !$mnh_do_concurrent(DOMAINE...)
+@D(DOMAINE)
+@endbigfunc
+
+@bigfunc !$mnh_end_do(DOMAINE...)
+@E(DOMAINE)
+@endbigfunc
+
 @endif
 
 
