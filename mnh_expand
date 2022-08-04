@@ -1,5 +1,16 @@
 #!/bin/bash
 export DIRNAME=$(dirname $(which $0))
+#
+# Find/set module directory of original 'filepp'
+#
+if [ -s $(which filepp) ] ; then
+export FILEPP=$( dirname $(which filepp) | sed -e 's|/bin||' )
+export FILEPPMOD=${FILEPP}/share/filepp/modules
+export PERL5LIB=${FILEPPMOD}:${PERL5LIB}
+else
+    echo "ERROR:: filepp is not in your PATH "
+    exit 100
+fi
 #get opt + filename
 OPT_FILEPP=""
 OPT_CPP=""
@@ -25,6 +36,6 @@ FILE=$1
 
 #set -x
 
-filepp  ${NO_CPP} -w ${OPT_CPP} ${FILE} | \
-    filepp ${OPT_FILEPP} -M${DIRNAME} -imacros ${DIRNAME}/mnh_macro_expand.fpp     -c -lc '&' -lr '@#@' | \
-    filepp ${OPT_FILEPP} -M${DIRNAME} -imacros ${DIRNAME}/mnh_macro_array_loop.fpp -c 
+MNH_filepp  ${NO_CPP} -w ${OPT_CPP} ${FILE} | \
+MNH_filepp ${OPT_FILEPP} -M${DIRNAME} -imacros ${DIRNAME}/mnh_macro_expand.fpp     -c -lc '&' -lr '@#@' | \
+MNH_filepp ${OPT_FILEPP} -M${DIRNAME} -imacros ${DIRNAME}/mnh_macro_array_loop.fpp -c 
