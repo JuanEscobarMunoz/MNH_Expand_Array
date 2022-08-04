@@ -112,6 +112,9 @@ sub Set_slide_default
 
     # Output DO nest or DO CONCCURENT
     my $do_list = "" ;
+    my $col_num = Filepp::GetLineBeginNum() ;
+    my $begin = Filepp::GetLineBegin() ;
+    Filepp::Debug( "ColumnNum=",$col_num,"#\n");
     if(Filepp::Ifdef("MNH_EXPAND_LOOP")) {
 	my $indice = "" ;
 	my $indent = 0 ;
@@ -128,7 +131,7 @@ sub Set_slide_default
 		#add space before do for identation
 		for ( my $i=0;$i<$indent;$i++ ) { $do_list .= " " } ; 
 		$do_list .= "DO $indice " ;
-		$do_list .= "\n" if ( $index != 0 ) ;
+		$do_list .= "\n" . $begin if ( $index != 0 ) ;
 		$indent++ ;		
 	    }
 	    $index-- ; 
@@ -154,6 +157,7 @@ sub Get_slide_default
     my $arg = join (",",@_) ;
     # Output ENDDO for LOOP or DO CONCURRENT
     my $enddo_list = "" ;
+    my $begin = Filepp::GetLineBegin() ;
     if(Filepp::Ifdef("MNH_EXPAND_LOOP")) {
 	my $index = -1 ;
 	my $size = @MNH_slide_default_begin ;
@@ -168,7 +172,7 @@ sub Get_slide_default
 		#add space before do for identation
 		for ( my $i=0;$i<$indent;$i++ ) { $enddo_list .= " " } ;
 		$enddo_list .= "ENDDO" ;
-		$enddo_list .= "\n" if ( $index < $size-1 ) ;
+		$enddo_list .= "\n" . $begin if ( $index < $size-1 ) ;
 		$indent-- ;
 	    }
 	}
