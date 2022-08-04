@@ -5,14 +5,26 @@
 # quelques scripts perl/bash utilisant "filepp" pour convertir
 # l'array syntaxe fortran en bloucle DO imbriqué ou DO CONCURRENT
 #
+
+#
 # Modif ::
-# version MNH_EXPAND_1-1-1 :: Juan 24/03/2022:: Bug correct : remove unnecessary new line in macro output 
+# version MNH_EXPAND_1-1-1 :: Juan 24/03/2022::
+#  Bug correct : remove unnecessary new line in macro output
+# version MNH_EXPAND_1-2-0 :: Juan 04/08/2022::
+#  manage space betwen array and '('
+#  Add indent functionnality for nested loops , for this use modified version of filepp=MNH_filepp with this new functionality
+#  Add new $mnh_do_concurrent/$mnh_end_do to expand only begin/end of do concurrent / nested loops
+#  in DO CONCURRENT , reverse order of arg for better performance with "acc parallel loop -> k,j,i like nest loop"
+#
+
 #
 # Set PATH
-
+#
 export PATH={...path_vers}/MNH_Expand_Array:${PATH}
 
+#
 # Usage
+#
 
 mnh_expand [OPTIONS] file.F90 > file.f90
 
@@ -94,6 +106,18 @@ Where + Array Syntaxe
 # /!\          A(:)= ...
 # /!\        END WHERE
 #
+
+#
+# Pour les Do Concurrent , possibilité de les convertir ( ou non ) en boucles imbriquées par
+#
+!$mnh_do_concurrent(ii=iib:iie:ip , ij=i2jb:ije , ik=ikb:ike:iks)
+
+   a(ii,ij,ik) = ...
+
+!$mnh_end_do()
+ 
+# Rem: le 'code' a l'intérieur n'est pas modifié <-> prévoir l'indentation de celui-ci pour la "prettines"
+ 
 #
 # Script mnh_expand = lancement 3 commandes filepp pipiliné + options + fichier d'entrée
 #
