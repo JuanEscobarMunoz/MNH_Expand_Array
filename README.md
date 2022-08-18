@@ -15,7 +15,8 @@
 #  Add indent functionnality for nested loops , for this use modified version of filepp=MNH_filepp with this new functionality
 #  Add new $mnh_do_concurrent/$mnh_end_do to expand only begin/end of do concurrent / nested loops
 #  in DO CONCURRENT , reverse order of arg for better performance with "acc parallel loop -> k,j,i like nest loop"
-#
+# version MNH_EXPAND_1-2-1 :: Juan 18/08/2022::
+#  Add "-DMNH_EXPAND_OPENACC" to add "!$acc loop collapse() indenpendent" on array expansion
 
 #
 # Set PATH
@@ -138,6 +139,9 @@ Where + Array Syntaxe
 #                          <-> cf  "@ifdef MNH_EXPAND" dans l'exemple
 #
 #
+#   -DMNH_EXPAND_OPENACC : add "!$acc loop collapse() indenpendent" on array expansion
+
+
 #Exemples
 #
 # preprocessing CPP + expansion de l'array syntax convertie en do nesté
