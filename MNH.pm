@@ -115,7 +115,18 @@ sub Set_slide_default
     my $col_num = Filepp::GetLineBeginNum() ;
     my $begin = Filepp::GetLineBegin() ;
     Filepp::Debug( "ColumnNum=",$col_num,"#\n");
+
+    # Out OpenACC loop collapse directive if asked
+    if(Filepp::Ifdef("MNH_EXPAND_OPENACC")) {
+	my $ncol = $index+1 ;
+	if ( $ncol == 1 ) {
+	    $do_list .= "!\$acc loop independent \n" . $begin }
+	else {
+	    $do_list .= "!\$acc loop collapse($ncol) independent \n" . $begin }
+    } 
+   
     if(Filepp::Ifdef("MNH_EXPAND_LOOP")) {
+        # output nested loop
 	my $indice = "" ;
 	my $indent = 0 ;
 	foreach $slide (@MNH_slide_default_begin)
@@ -138,11 +149,12 @@ sub Set_slide_default
 	}
 	#print "\n" ;
        }
-       else {
-	   $arg  = join ("," , reverse(@_) ) ;
-	   $do_list = "DO CONCURRENT ($arg)" ;
+    else {
+	# output do concurrent
+	$arg  = join ("," , reverse(@_) ) ;
+	$do_list .= "DO CONCURRENT ($arg)" ;
        }
-       return $do_list ;    
+    return $do_list ;    
 }
 Function::AddFunction("set_slide_default", "MNH::Set_slide_default");
 
