@@ -5,7 +5,16 @@
 
 #pragma filepp UseModule MNH.pm
 #pragma filepp UseModule regexp.pm
+#pragma filepp UseModule MNH_bigfunc.pm
 #regexp /@#@/&\n/
 #comment regexp /^\s*$//
+
+#bigfunc !$mnh_undef(TYPE)
+@undef MNH_EXPAND_TYPE
+#endbigfunc
+
+#bigfunc !$mnh_define(TYPE)
+@define MNH_EXPAND_TYPE
+#endbigfunc
 
 #pragma filepp SetKeywordchar @
