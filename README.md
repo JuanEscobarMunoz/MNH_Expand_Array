@@ -17,7 +17,8 @@
 #  in DO CONCURRENT , reverse order of arg for better performance with "acc parallel loop -> k,j,i like nest loop"
 # version MNH_EXPAND_1-2-1 :: Juan 18/08/2022::
 #  Add "-DMNH_EXPAND_OPENACC" to add "!$acc loop collapse() indenpendent" on array expansion
-
+# version MNH_EXPAND_1-2-2 :: Juan 22/08/2022::
+#  Add function !$mnh_undef/!$mnh_define to change MNH_EXPAND_{TYPE} macro status
 #
 # Set PATH
 #
