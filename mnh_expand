@@ -24,6 +24,9 @@ while [[ $# -gt 1 ]]; do
 	    ;;	
 	-DMNH_EXPAND*)
 	    OPT_FILEPP+=" $1"
+	    ;;	
+	-d*)
+	    OPT_FILEPP+=" $1"		
 	    ;;
     esac
     shift      
