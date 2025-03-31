@@ -7,7 +7,7 @@ package MNH;
 use strict;
 
 # version number of module
-my $VERSION = '1.0.0';
+my $VERSION = '1.2.3';
 
 require "function.pm";
 
@@ -46,6 +46,7 @@ sub Set_slide_default
     my $slide;
 
     my $slide_on  = 0 ;
+    my $slide_openacc = -1 ;
     my $slide_name  = "" ;
     my $slide_begin = "" ;  
     my $slide_end   = "" ;
@@ -69,17 +70,20 @@ sub Set_slide_default
     
     # index in the array of slide gatherd
     my $index = -1 ;
+    my $index_on = -1 ;
+    
 
     # loop over slide
     foreach $slide (@_) 
     { 
 	$index ++ ;
-	# surpress space
-	$slide =~ s/\s//g ;
 	#
 	if ( $slide =~ /:/ ) {
 	    # slide contain ':' -> Ok ,register it
+	    # surpress space
+	    $slide =~ s/\s//g ;
 	    $slide_on  = 1 ;
+	    $index_on ++ ;
 	    ( $slide_name , $slide_begin, $slide_end , $x ,$slide_step )
 		= ( $slide =~ /^\s*([A-z]\w*)=([^:]*):([^:]*)(:([^:]+))?/ ) ;
 	    
@@ -92,8 +96,17 @@ sub Set_slide_default
 	else {
 	    # slide without ':' <-> index variable or constant , inactivate it 
 	    $slide_on  = 0 ;
+	    if ( $slide =~ /OPENACC/ ) { 
+		$slide_openacc  = $index ;
+		# add OPENACC optional statement :: private/shared, etc...
+		( $slide_name , $slide_begin, $slide_end , $x ,$slide_step )
+		    = ( $slide =~ /^\s*([A-z]\w*)=(.*)/ ) ;
+		$liste .= " N=$slide_name = B =$slide_begin |" ;
+	    }
+	    else {
 	    ( $slide_name , $slide_begin, $slide_end ,$slide_step ) = ( "NA" , $slide , "NA", "NA" ) ;
 	    $liste .= " $slide |" ;
+	    }
 	}
 	
 	push ( @MNH_slide_default_on    , $slide_on ) ;
@@ -118,11 +131,17 @@ sub Set_slide_default
 
     # Out OpenACC loop collapse directive if asked
     if(Filepp::Ifdef("MNH_EXPAND_OPENACC")) {
-	my $ncol = $index+1 ;
+	my $ncol = $index_on+1 ;
 	if ( $ncol == 1 ) {
-	    $do_list .= "!\$acc loop independent \n" . $begin }
+	    $do_list .= "!\$acc loop independent" . $begin }
 	else {
-	    $do_list .= "!\$acc loop collapse($ncol) independent \n" . $begin }
+	    $do_list .= "!\$acc loop collapse($ncol) independent" . $begin }
+	if ( $slide_openacc > -1 ) {
+	    $slide_begin = $MNH_slide_default_begin[$slide_openacc] ;
+	    # remove residual ' or "
+	    $slide_begin =~ s/['"]//g ;
+	    $do_list .= $slide_begin }
+	$do_list .= " \n" ;
     } 
    
     if(Filepp::Ifdef("MNH_EXPAND_LOOP")) {
@@ -151,8 +170,19 @@ sub Set_slide_default
        }
     else {
 	# output do concurrent
-	$arg  = join ("," , reverse(@_) ) ;
-	$do_list .= "DO CONCURRENT ($arg)" ;
+	# only use active slide with ':' in the index declaration <-> other are disscarded, usefull for boundary slides  
+	my @args = @_ ;
+	my @args_on = () ;
+	foreach $slide (@args)
+	{
+	    $slide_on = $MNH_slide_default_on[$index] ;
+	    if ( $slide_on ) {
+		push ( @args_on , $args[$index] ) ;	
+	    }
+	    $index-- ;
+	}
+	$arg  = join (" , " , @args_on ) ;
+	$do_list .= "DO CONCURRENT ( $arg )" ;
        }
     return $do_list ;    
 }
