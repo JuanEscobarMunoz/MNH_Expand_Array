@@ -19,6 +19,11 @@
 #  Add "-DMNH_EXPAND_OPENACC" to add "!$acc loop collapse() indenpendent" on array expansion
 # version MNH_EXPAND_1-2-2 :: Juan 22/08/2022::
 #  Add function !$mnh_undef/!$mnh_define to change MNH_EXPAND_{TYPE} macro status
+# version MNH_EXPAND_1-2-3 :: Juan 31/03/2025::
+#  mnh_expand, parse debug "-d" option
+#  Add foreach loop in !$mnh_undef/!$mnh_define for multiple undef or define at one time
+#  Correction for "DO CONCURENT" with empty 2nd slide !$mnh_...(JI=1:JIU, ,JK=1:JKU )
+#  Add optional argument for extra OpenACC directive <=> !$mnh(..., OPENACC="{acc directive}")
 #
 # Set PATH
 #
