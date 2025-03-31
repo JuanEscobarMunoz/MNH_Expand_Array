@@ -10,28 +10,28 @@
 #regexp /@#@/&\n/
 #comment regexp /^\s*$//
 
-#bigfunc !$mnh_undef(TYPE)
+#bigfunc !$mnh_undefX(TYPE)
 @undef MNH_EXPAND_TYPE
 #endbigfunc
 
-#bigfunc !$mnh_define(TYPE)
+#bigfunc !$mnh_defineX(TYPE)
 @define MNH_EXPAND_TYPE
 #endbigfunc
 
 
 #comment, macro for multiple undef or define a one time
 
-#bigfunc !$mnh_undefX(TYPE)
+#bigfunc !$mnh_undef(TYPE)
 ! mnh_undef TYPE
 @foreach type TYPE
-!$mnh_undef(type)
+!$mnh_undefX(type)
 @endforeach
 #endbigfunc
 
-#bigfunc !$mnh_defineX(TYPE...)
+#bigfunc !$mnh_define(TYPE...)
 ! mnh_define TYPE
 @foreach type TYPE
-!$mnh_define(type)
+!$mnh_defineX(type)
 @endforeach
 #endbigfunc
 
